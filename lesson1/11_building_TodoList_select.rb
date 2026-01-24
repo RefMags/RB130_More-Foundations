@@ -94,16 +94,42 @@ class TodoList
     @todos.each_index { |idx| mark_done_at(idx)}
   end
 
+
   def remove_at(index)
     @todos.delete(item_at(index))
   end
-
-  # Implementintng each method ---------
 
   def each
     @todos.each do |todo|
       yield(todo)
     end
+
+    self # we are interested the `TodoList` instance thus use self to refer to it.
+  end
+
+  # def select
+  #   # -----implementation with generic `select` within custom select----
+  #   # @todos.select do |todo|
+  #   #   yield(todo)
+  #   # end
+  #   #-----implementation manualy using `each` within custom select----
+  #   results = []
+
+  #   each do |todo|
+  #     results << todo if yield(todo)
+  #   end
+
+  #   results
+  # end
+  #
+  #---------Implementing refined select to return TodoList object------------#
+  def select
+    list = TodoList.new(title)
+    each do |todo|
+      list.add(todo) if yield(todo)
+    end
+
+    list
   end
 
   def to_s
@@ -127,11 +153,15 @@ list = TodoList.new("Today's Todos")
 # ---- Adding to the list -----
 
 # add
-list.add(todo2)                 # adds todo2 to end of list, returns list
-list.add(todo1)                 # adds todo1 to end of list, returns list
+list.add(todo1)                 # adds todo2 to end of list, returns list
+list.add(todo2)                 # adds todo1 to end of list, returns list
 list.add(todo3)                 # adds todo3 to end of list, returns list
 # list.add(1)                     # raises TypeError with message "Can only add Todo objects"
 
-result = list.each { |todo| todo }
+todo1.done!
 
-p result.class # note that we are returning an array.
+list.each { |todo| todo }
+
+result = list.select { |todo| todo.done? }
+
+puts result.inspect
